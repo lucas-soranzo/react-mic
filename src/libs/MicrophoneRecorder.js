@@ -72,7 +72,7 @@ export class MicrophoneRecorder {
       navigator.mediaDevices.getUserMedia(constraints).then((str) => {
         stream = str
 
-        if (window.MediaRecorder) {
+        if (window.MediaRecorder && window.MediaRecorder.hasOwnProperty('isTypeSupported')) {
           if (MediaRecorder.isTypeSupported(mediaOptions.mimeType)) {
             mediaRecorder = new MediaRecorder(str, mediaOptions)
           } else {
