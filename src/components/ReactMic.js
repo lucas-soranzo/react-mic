@@ -12,7 +12,6 @@ import { MicrophoneRecorder } from '../libs/MicrophoneRecorder'
 import AudioPlayer            from '../libs/AudioPlayer'
 import Visualizer             from '../libs/Visualizer'
 
-
 export default class ReactMic extends Component {
   constructor(props) {
     super(props)
@@ -47,6 +46,7 @@ export default class ReactMic extends Component {
       onStop,
       onStart,
       onData,
+      onAudioContext,
       audioElem,
       audioBitsPerSecond,
       echoCancellation,
@@ -84,6 +84,7 @@ export default class ReactMic extends Component {
           onStop,
           onSave,
           onData,
+          onAudioContext,
           options,
           soundOptions
         ),
@@ -140,6 +141,7 @@ ReactMic.propTypes = {
   record: bool.isRequired,
   onStop: func,
   onData: func,
+  onAudioContext: func,
   onSave: func
 }
 

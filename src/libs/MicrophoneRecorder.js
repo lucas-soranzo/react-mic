@@ -12,6 +12,7 @@ let onStartCallback
 let onStopCallback
 let onSaveCallback
 let onDataCallback
+let onAudioContextCallback
 let constraints
 
 navigator.getUserMedia = navigator.getUserMedia
@@ -20,7 +21,7 @@ navigator.getUserMedia = navigator.getUserMedia
   || navigator.msGetUserMedia
 
 export class MicrophoneRecorder {
-  constructor(onStart, onStop, onSave, onData, options, soundOptions) {
+  constructor(onStart, onStop, onSave, onData, onAudioContext, options, soundOptions) {
     const {
       echoCancellation,
       autoGainControl,
@@ -32,6 +33,7 @@ export class MicrophoneRecorder {
     onStopCallback = onStop
     onSaveCallback = onSave
     onDataCallback = onData
+    onAudioContextCallback = onAudioContext
     mediaOptions = options
 
     constraints = {
@@ -63,7 +65,7 @@ export class MicrophoneRecorder {
         const source = audioCtx.createMediaStreamSource(stream)
         source.connect(analyser)
         if (onStartCallback) {
-          onStartCallback()
+          onStartCallback(stream)
         }
       }
     } else if (navigator.mediaDevices) {
@@ -79,7 +81,7 @@ export class MicrophoneRecorder {
             mediaRecorder = new MediaRecorder(str)
           }
           if (onStartCallback) {
-            onStartCallback()
+            onStartCallback(stream)
           }
 
           mediaRecorder.onstop = this.onStop
@@ -96,16 +98,18 @@ export class MicrophoneRecorder {
             mediaRecorder.start(10)
             const sourceNode = audioCtx.createMediaStreamSource(stream)
             sourceNode.connect(analyser)
+            if (onAudioContextCallback) {
+              onAudioContextCallback(stream, audioCtx, analyser)
+            }
           })
         } else {
-          mediaRecorder = new AudioRecorder(str)
+          mediaRecorder = new AudioRecorder(str, mediaOptions)
           if (onStartCallback) {
-            onStartCallback()
+            onStartCallback(stream)
           }
 
           mediaRecorder.addEventListener('stop', this.onStop)
           mediaRecorder.addEventListener('dataavailable', (event) => {
-            console.log(event.data.type)
             chunks.push(event.data)
             if (onDataCallback) {
               onDataCallback(event.data)
@@ -118,6 +122,9 @@ export class MicrophoneRecorder {
             mediaRecorder.start(10)
             const sourceNode = audioCtx.createMediaStreamSource(stream)
             sourceNode.connect(analyser)
+            if (onAudioContextCallback) {
+              onAudioContextCallback(stream, audioCtx, analyser)
+            }
           })
         }
       })
